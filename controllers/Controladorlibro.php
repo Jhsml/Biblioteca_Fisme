@@ -1,5 +1,5 @@
 <?php
-require_once 'models/Libro.php';
+require_once __DIR__ . '/../models/Libro.php';
 
 class Controladorlibro {
     private $bookModel;
@@ -80,22 +80,6 @@ class Controladorlibro {
         include 'views/home/vista_libros.php';
         include 'views/layout/Piedepagina.php';
     }
-    public function verDetalle() {
-    $id = $_GET['id'] ?? 0;
-    $detalle = $this->bookModel->getById($id);
-
-    if (!$detalle) {
-        include 'views/layout/Encabezado.php';
-        echo "<h2>Libro no encontrado</h2>";
-        include 'views/layout/Piedepagina.php';
-        return;
-    }
-
-    include 'views/layout/Encabezado.php';
-    include 'views/home/vista_detalle_libro.php';
-    include 'views/layout/Piedepagina.php';
-    
-}
 }
 ?>
 

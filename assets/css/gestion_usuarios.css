@@ -1,0 +1,64 @@
+/* Estilos personalizados para gestión de usuarios refinados */
+.gestion-usuarios-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.gestion-usuarios-box {
+    background: #fafdff;
+    border: 2px solid #b3e0fc; /* Celeste pastel */
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 8px rgba(179,224,252,0.10);
+    margin: 0;
+    padding: 0;
+    min-width: 340px;
+    max-width: 500px;
+    flex: 1 1 350px;
+    z-index: 2;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+.gestion-usuarios-box:hover {
+    box-shadow: 0 8px 24px rgba(179,224,252,0.18);
+    border-color: #7fd0f7;
+}
+.gestion-usuarios-box.right {
+    border-left: 2px solid #b3e0fc;
+    z-index: 1;
+}
+.card-header.bg-gradient-primary,
+.card-header.bg-gradient-success {
+    background: linear-gradient(90deg, #b3e0fc 0%, #e3f6ff 100%) !important;
+    color: #007bff !important;
+    border-bottom: 1px solid #b3e0fc;
+}
+.card {
+    border: none;
+    border-radius: 1.2rem;
+}
+.card-body.bg-light {
+    background: #fafdff !important;
+}
+.list-group-item {
+    border: 1px solid #e3f6ff;
+    border-radius: 0.5rem;
+    margin-bottom: 0.4rem;
+    background: #fff;
+    transition: box-shadow 0.15s;
+}
+.list-group-item:hover {
+    box-shadow: 0 2px 8px rgba(179,224,252,0.13);
+}
+@media (max-width: 991px) {
+    .gestion-usuarios-wrapper {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .gestion-usuarios-box,
+    .gestion-usuarios-box.right {
+        border-radius: 1.2rem;
+        border-left: 2px solid #b3e0fc;
+        margin-bottom: 1.5rem;
+    }
+}

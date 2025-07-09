@@ -89,5 +89,36 @@ class Usuario {
 
         return $usuarios;
     }
+
+    public function registrarUsuario($nombre_completo, $correo, $contraseña, $telefono, $direccion, $rol_id, $escuela_id, &$errorMsg = null) {
+        $conn = $this->db->getConexion();
+        $passwordHash = password_hash($contraseña, PASSWORD_DEFAULT);
+        $sql = "INSERT INTO usuarios (nombre_completo, correo, contraseña, telefono, direccion, rol_id, escuela_id, fecha_registro) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            $errorMsg = $conn->error;
+            return false;
+        }
+        $stmt->bind_param("ssssiii", $nombre_completo, $correo, $passwordHash, $telefono, $direccion, $rol_id, $escuela_id);
+        $result = $stmt->execute();
+        if (!$result) {
+            $errorMsg = $stmt->error;
+        }
+        $stmt->close();
+        return $result;
+    }
+
+    public function listarUsuarios() {
+        $conn = $this->db->getConexion();
+        $sql = "SELECT u.id, u.nombre_completo, u.correo, r.nombre AS nombre_rol, e.nombre AS nombre_escuela FROM usuarios u LEFT JOIN roles r ON u.rol_id = r.id LEFT JOIN escuelas e ON u.escuela_id = e.id ORDER BY u.id DESC";
+        $result = $conn->query($sql);
+        $usuarios = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $usuarios[] = $row;
+            }
+        }
+        return $usuarios;
+    }
 }
 ?>

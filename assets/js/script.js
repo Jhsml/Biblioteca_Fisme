@@ -2,99 +2,101 @@
 let currentUser = null;
 let isAuthModalOpen = false;
 let isBookModalOpen = false;
-
 // Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function()
+{
     initializeApp();
 });
 
-function initializeApp() {
+function initializeApp()
+{
     // Load user reservations if logged in
     loadUserReservations();
-    
     // Set up form event listeners
     setupFormListeners();
-    
     // Close modals when clicking outside
     setupModalListeners();
 }
-
 // Auth Modal Functions
-function openAuthModal() {
+function openAuthModal()
+{
     const modal = document.getElementById('authModal');
     modal.classList.add('active');
     isAuthModalOpen = true;
     document.body.style.overflow = 'hidden';
 }
 
-function closeAuthModal() {
+function closeAuthModal()
+{
     const modal = document.getElementById('authModal');
     modal.classList.remove('active');
     isAuthModalOpen = false;
     document.body.style.overflow = '';
-    
     // Reset forms
     document.getElementById('loginForm').reset();
     document.getElementById('registerForm').reset();
     hideError();
 }
 
-function switchTab(tab) {
+function switchTab(tab)
+{
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const modalTitle = document.getElementById('modalTitle');
-    
     // Update tab buttons
     tabBtns.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
-    
     // Show/hide forms
-    if (tab === 'login') {
+    if(tab === 'login')
+    {
         loginForm.classList.add('active');
         registerForm.classList.remove('active');
         modalTitle.textContent = 'Iniciar Sesión';
-    } else {
+    }
+    else
+    {
         loginForm.classList.remove('active');
         registerForm.classList.add('active');
         modalTitle.textContent = 'Registrarse';
     }
-    
     hideError();
 }
-
 // Book Modal Functions
-function showBookDetails(bookId) {
+function showBookDetails(bookId)
+{
     const modal = document.getElementById('bookModal');
     const content = document.getElementById('bookModalContent');
-
     content.innerHTML = '<div class="text-center"><p>Cargando...</p></div>';
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-  fetch(`index.php?page=books&action=details&id=${bookId}`) // ← ¡correcto si usas Controladorinicio!
+   fetch(`index.php?page=libro&action=details&id=${bookId}`) // ← ¡correcto si usas Controladorinicio!
         .then(response => response.json())
-        .then(book => {
-            content.innerHTML = generateBookDetailsHTML(book);  // Asegúrate de que esta función esté definida
+        .then(book =>
+        {
+            content.innerHTML = generateBookDetailsHTML(book); // Asegúrate de que esta función esté definida
         })
-        .catch(error => {
+        .catch(error =>
+        {
             content.innerHTML = '<div class="text-center"><p>Error al cargar los detalles del libro</p></div>';
             console.error('Error:', error);
         });
 }
 
-function closeBookModal() {
+function closeBookModal()
+{
     const modal = document.getElementById('bookModal');
     modal.classList.remove('active');
     isBookModalOpen = false;
     document.body.style.overflow = '';
 }
 
-function generateBookDetailsHTML(book) {
+function generateBookDetailsHTML(book)
+{
     const availableCount = book.ejemplares ? book.ejemplares.filter(e => e.estado === 'disponible').length : 0;
     const isAvailable = availableCount > 0;
     const isLoggedIn = document.querySelector('.user-info') !== null;
-    
     return `
         <div class="book-details-content">
             <div class="book-details-grid">
@@ -316,158 +318,60 @@ function generateBookDetailsHTML(book) {
         </style>
     `;
 }
-
 // Book Reservation Functions
-function reserveBook(bookId) {
-    if (!document.querySelector('.user-info')) {
+function reserveBook(bookId)
+{
+    if(!document.querySelector('.user-info'))
+    {
         openAuthModal();
         return;
     }
-
+    
     const formData = new FormData();
     formData.append('libro_id', bookId);
-
+    
     fetch('index.php?page=books&action=reserve', {
         method: 'POST',
         body: formData
-    })
-    .then(async response => {
-        const text = await response.text();
-
-        try {
-            const data = JSON.parse(text); // Verifica si es JSON válido
-
-            if (data.success) {
-                showMessage(data.message, 'success');
-                loadUserReservations();
-            } else {
-                showMessage(data.message || 'Ocurrió un error', 'error');
-            }
-        } catch (e) {
-            console.error('Respuesta inesperada del servidor:', text);
-            showMessage('Error del servidor. Ver consola.', 'error');
-        }
-    })
-    .catch(error => {
-        showMessage('Error al procesar la reserva', 'error');
-        console.error('Error de red:', error);
-    });
-}
-function reserveBookFromModal(libroId) {
-   if (!document.querySelector('.user-info')) {
-        openAuthModal();
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('libro_id', libroId);
-
-    fetch('index.php?page=books&action=reserve', {
-        method: 'POST',
-        body: formData
-    })
-    .then(async response => {
-        const text = await response.text();
-
-        try {
-            const data = JSON.parse(text); // Verifica si es JSON válido
-
-            if (data.success) {
-                showMessage(data.message, 'success');
-                loadUserReservations();
-            } else {
-                showMessage(data.message || 'Ocurrió un error', 'error');
-            }
-        } catch (e) {
-            console.error('Respuesta inesperada del servidor:', text);
-            showMessage('Error del servidor. Ver consola.', 'error');
-        }
-    })
-    .catch(error => {
-        showMessage('Error al procesar la reserva', 'error');
-        console.error('Error de red:', error);
-    });
-}
-function marcarDevuelto(id) {
-    fetch('index.php?page=loans&action=markReturned', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `loan_id=${encodeURIComponent(id)}`
     })
     .then(response => response.json())
     .then(data => {
-        showMessage(data.message, data.success ? 'success' : 'error');
         if (data.success) {
-            const row = document.querySelector(`button[onclick="marcarDevuelto(${id})"]`).closest('tr');
-            if (row) row.remove();
+            showMessage(data.message, 'success');
+            loadUserReservations();
+        } else {
+            showMessage(data.message, 'error');
         }
     })
     .catch(error => {
-        showMessage('Error al marcar como devuelto', 'error');
+        showMessage('Error al procesar la reserva', 'error');
         console.error('Error:', error);
     });
 }
-function markNotReturned(loanId) {
+
+function reserveBookFromModal(bookId) {
+    reserveBook(bookId);
+    closeBookModal();
+}
+
+// Loan Management Functions
+function confirmLoan(loanId) {
     const formData = new FormData();
     formData.append('loan_id', loanId);
-
-    fetch('index.php?page=loans&action=marcarNoDevuelto', {
+    
+    fetch('index.php?page=loans&action=confirm', {
         method: 'POST',
         body: formData
     })
-    .then(res => res.text())
-    .then(text => {
-        try {
-            const json = JSON.parse(text);
-           showMessage(json.message, 'error');
-
-            if (json.success) {
-                const button = document.querySelector(`button[onclick="markNotReturned(${loanId})"]`);
-                if (button) {
-                    const row = button.closest('tr');
-                    if (row) {
-                        // Buscar el <span> con la clase status-badge dentro del <td>
-                        const estadoSpan = row.querySelector('td span.status-badge');
-                        if (estadoSpan) {
-                            // Actualizar el texto
-                            estadoSpan.textContent = 'Perdido';
-
-                            // Quitar clases previas de estado
-                            estadoSpan.classList.remove('status-activo', 'status-devuelto', 'status-perdido');
-                            // Añadir la clase correspondiente a "perdido"
-                            estadoSpan.classList.add('status-perdido');
-                        }
-                    }
-                }
-            }
-        } catch (e) {
-            console.error('Respuesta no válida:', text);
-            showMessage('Error inesperado. Revisa consola.', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error de red:', error);
-        showMessage('Error de red al procesar la solicitud', 'error');
-    });
-}
-
-
-
-// Loan Management Functions
-function confirmLoan(id) {
-    fetch('index.php?page=loans&action=confirm', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `loan_id=${encodeURIComponent(id)}`
-    })
     .then(response => response.json())
     .then(data => {
-        showMessage(data.message, data.success ? 'success' : 'error');
         if (data.success) {
-            const row = document.querySelector(`button[onclick="confirmLoan(${id})"]`).closest('tr');
-            if (row) row.remove();
+            showMessage(data.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showMessage(data.message, 'error');
         }
     })
     .catch(error => {
@@ -475,44 +379,12 @@ function confirmLoan(id) {
         console.error('Error:', error);
     });
 }
-function rejectLoan(id) {
-    fetch('index.php?page=loans&action=reject', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `loan_id=${encodeURIComponent(id)}`
-    })
-    .then(response => response.text())
-    .then(text => {
-        try {
-            const data = JSON.parse(text);
-
-            // 🔴 SIEMPRE mensaje rojo aunque sea success
-            showMessage(data.message, 'error');
-
-            if (data.success) {
-                const row = document.querySelector(`button[onclick="rejectLoan(${id})"]`).closest('tr');
-                if (row) row.remove();
-            }
-        } catch (e) {
-            console.error('Respuesta no válida:', text);
-            showMessage('Respuesta no válida del servidor', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('Error de red al rechazar el préstamo', 'error');
-    });
-}
-
-
 
 // User Reservations
-function loadUserReservations() {
+function loadUserReservations()
+{
     const container = document.getElementById('userReservations');
-    if (!container) return;
-    
+    if(!container) return;
     // Mock user reservations for demo
     container.innerHTML = `
         <div class="reservation-item">
@@ -611,172 +483,189 @@ function loadUserReservations() {
         </style>
     `;
 }
-
 // Form Handling
-function setupFormListeners() {
+function setupFormListeners()
+{
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    
-    if (loginForm) {
+    if(loginForm)
+    {
         loginForm.addEventListener('submit', handleLogin);
     }
-    
-    if (registerForm) {
+    if(registerForm)
+    {
         registerForm.addEventListener('submit', handleRegister);
     }
 }
 
-function handleLogin(event) {
+function handleLogin(event)
+{
     event.preventDefault();
-
     const formData = new FormData(event.target);
     const submitBtn = event.target.querySelector('.submit-btn');
-
     submitBtn.disabled = true;
     submitBtn.textContent = 'Iniciando sesión...';
-
-    fetch('index.php?page=auth&action=login', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json()) // 🔁 CAMBIADO: era .text()
-    .then(data => {
-        if (data.success) {
-            location.reload(); // ✅ esto fuerza la recarga y actualiza la sesión
-        } else {
-            showError(data.message || 'Credenciales incorrectas');
-        }
-    })
-    .catch(error => {
-        showError('Error al iniciar sesión');
-        console.error('Error:', error);
-    })
-    .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Iniciar Sesión';
-    });
+    fetch('index.php?page=auth&action=login',
+        {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json()) // 🔁 CAMBIADO: era .text()
+        .then(data =>
+        {
+            if(data.success)
+            {
+                location.reload(); // ✅ esto fuerza la recarga y actualiza la sesión
+            }
+            else
+            {
+                showError(data.message || 'Credenciales incorrectas');
+            }
+        })
+        .catch(error =>
+        {
+            showError('Error al iniciar sesión');
+            console.error('Error:', error);
+        })
+        .finally(() =>
+        {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Iniciar Sesión';
+        });
 }
 
-
-
-
-function handleRegister(event) {
+function handleRegister(event)
+{
     event.preventDefault();
-
     const formData = new FormData(event.target);
     const password = formData.get('contraseña');
     const confirmPassword = formData.get('confirmar_contraseña');
-
-    if (password !== confirmPassword) {
+    if(password !== confirmPassword)
+    {
         showError('Las contraseñas no coinciden');
         return;
     }
-
-    if (password.length < 6) {
+    if(password.length < 6)
+    {
         showError('La contraseña debe tener al menos 6 caracteres');
         return;
     }
-
     const submitBtn = event.target.querySelector('.submit-btn');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Registrando...';
-
-    fetch('index.php?page=auth&action=register', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.text())
-    .then(text => {
-        console.log("🔍 Respuesta sin parsear:", text);
-        try {
-            const data = JSON.parse(text);
-            if (data.redirect) {
-                window.location.href = data.redirect;
-            } else if (data.message) {
-                showError(data.message);
-            } else {
-                showError("Error desconocido en el registro");
+    fetch('index.php?page=auth&action=register',
+        {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(text =>
+        {
+            console.log("🔍 Respuesta sin parsear:", text);
+            try
+            {
+                const data = JSON.parse(text);
+                if(data.redirect)
+                {
+                    window.location.href = data.redirect;
+                }
+                else if(data.message)
+                {
+                    showError(data.message);
+                }
+                else
+                {
+                    showError("Error desconocido en el registro");
+                }
             }
-        } catch (e) {
-            showError("⚠️ El servidor no respondió correctamente");
-            console.error("❌ Respuesta no válida JSON:", text);
-        }
-    })
-    .catch(error => {
-        showError('Error al registrar usuario');
-        console.error('🚨 Error:', error);
-    })
-    .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Registrarse';
-    });
+            catch (e)
+            {
+                showError("⚠️ El servidor no respondió correctamente");
+                console.error("❌ Respuesta no válida JSON:", text);
+            }
+        })
+        .catch(error =>
+        {
+            showError('Error al registrar usuario');
+            console.error('🚨 Error:', error);
+        })
+        .finally(() =>
+        {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Registrarse';
+        });
 }
-
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () =>
+{
     const form = document.getElementById('registerForm');
-    if (form) {
+    if(form)
+    {
         form.addEventListener('submit', handleRegister);
         console.log("🟢 Formulario de registro conectado correctamente");
-    } else {
+    }
+    else
+    {
         console.log("🔴 No se encontró el formulario con ID registerForm");
     }
 });
-
-
-
 // Este código se asegura que la función se asocie correctamente al formulario
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function()
+{
     const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
+    if(registerForm)
+    {
         registerForm.addEventListener('submit', handleRegister);
     }
 });
-
-
 // Modal Event Listeners
-function setupModalListeners() {
+function setupModalListeners()
+{
     // Close modals when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function(event)
+    {
         const authModal = document.getElementById('authModal');
         const bookModal = document.getElementById('bookModal');
-        
-        if (event.target === authModal && isAuthModalOpen) {
+        if(event.target === authModal && isAuthModalOpen)
+        {
             closeAuthModal();
         }
-        
-        if (event.target === bookModal && isBookModalOpen) {
+        if(event.target === bookModal && isBookModalOpen)
+        {
             closeBookModal();
         }
     });
-    
     // Close modals with Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            if (isAuthModalOpen) {
+    document.addEventListener('keydown', function(event)
+    {
+        if(event.key === 'Escape')
+        {
+            if(isAuthModalOpen)
+            {
                 closeAuthModal();
             }
-            if (isBookModalOpen) {
+            if(isBookModalOpen)
+            {
                 closeBookModal();
             }
         }
     });
 }
-
 // Utility Functions
-function togglePassword(button) {
+function togglePassword(button)
+{
     const input = button.parentElement.querySelector('input');
     const isPassword = input.type === 'password';
-    
     input.type = isPassword ? 'text' : 'password';
-    
     const svg = button.querySelector('svg');
-    if (isPassword) {
+    if(isPassword)
+    {
         svg.innerHTML = `
             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
             <line x1="1" y1="1" x2="23" y2="23"></line>
         `;
-    } else {
+    }
+    else
+    {
         svg.innerHTML = `
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
             <circle cx="12" cy="12" r="3"></circle>
@@ -784,23 +673,25 @@ function togglePassword(button) {
     }
 }
 
-function showError(message) {
+function showError(message)
+{
     const errorDiv = document.getElementById('errorMessage');
     errorDiv.textContent = message;
     errorDiv.style.display = 'block';
 }
 
-function hideError() {
+function hideError()
+{
     const errorDiv = document.getElementById('errorMessage');
     errorDiv.style.display = 'none';
 }
 
-function showMessage(message, type = 'info') {
+function showMessage(message, type = 'info')
+{
     // Create message element
     const messageDiv = document.createElement('div');
     messageDiv.className = `message-toast message-${type}`;
     messageDiv.textContent = message;
-    
     // Add styles
     messageDiv.style.cssText = `
         position: fixed;
@@ -815,15 +706,18 @@ function showMessage(message, type = 'info') {
         max-width: 300px;
         word-wrap: break-word;
     `;
-    
-    if (type === 'success') {
+    if(type === 'success')
+    {
         messageDiv.style.backgroundColor = '#059669';
-    } else if (type === 'error') {
+    }
+    else if(type === 'error')
+    {
         messageDiv.style.backgroundColor = '#dc2626';
-    } else {
+    }
+    else
+    {
         messageDiv.style.backgroundColor = '#2563eb';
     }
-    
     // Add animation styles
     const style = document.createElement('style');
     style.textContent = `
@@ -849,38 +743,41 @@ function showMessage(message, type = 'info') {
             }
         }
     `;
-    
-    if (!document.querySelector('style[data-toast]')) {
+    if(!document.querySelector('style[data-toast]'))
+    {
         style.setAttribute('data-toast', 'true');
         document.head.appendChild(style);
     }
-    
     document.body.appendChild(messageDiv);
-    
     // Remove after 3 seconds
-    setTimeout(() => {
+    setTimeout(() =>
+    {
         messageDiv.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => {
-            if (messageDiv.parentNode) {
+        setTimeout(() =>
+        {
+            if(messageDiv.parentNode)
+            {
                 messageDiv.parentNode.removeChild(messageDiv);
             }
         }, 300);
     }, 3000);
 }
-
 // Search functionality
-function handleSearch() {
+function handleSearch()
+{
     const searchForm = document.querySelector('.search-form');
-    if (searchForm) {
-        searchForm.addEventListener('submit', function(event) {
+    if(searchForm)
+    {
+        searchForm.addEventListener('submit', function(event)
+        {
             const searchInput = this.querySelector('input[name="search"]');
-            if (!searchInput.value.trim()) {
+            if(!searchInput.value.trim())
+            {
                 event.preventDefault();
                 window.location.href = 'index.php';
             }
         });
     }
 }
-
 // Initialize search
 document.addEventListener('DOMContentLoaded', handleSearch);

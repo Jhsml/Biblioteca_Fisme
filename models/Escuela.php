@@ -19,6 +19,18 @@ class Escuela {
         }
         return $escuelas;
     }
+
+    public function listarEscuelas() {
+        $escuelas = [];
+        $sql = "SELECT id, nombre FROM escuelas ORDER BY nombre ASC";
+        $result = $this->db->query($sql);
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $escuelas[] = $row;
+            }
+        }
+        return $escuelas;
+    }
 }
 
 

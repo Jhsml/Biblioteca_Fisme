@@ -1,5 +1,5 @@
 <?php
-require_once 'config/Conexion.php';
+require_once __DIR__ . '/../config/Conexion.php';
 
 class Libro {
     private $db;
@@ -98,6 +98,33 @@ class Libro {
             }
         }
         return $libros;
+    }
+
+    public function registrarLibro($data, &$errorMsg = null) {
+        try {
+            $stmt = $this->db->prepare("INSERT INTO libros (isbn, titulo, descripcion, publicacion_anio, editorial_id) VALUES (?, ?, ?, ?, ?)");
+            if (!$stmt) {
+                $errorMsg = $this->db->error;
+                return false;
+            }
+            $stmt->bind_param(
+                "ssssi",
+                $data['isbn'],
+                $data['titulo'],
+                $data['descripcion'],
+                $data['publicacion_anio'],
+                $data['editorial_id']
+            );
+            $result = $stmt->execute();
+            if (!$result) {
+                $errorMsg = $stmt->error;
+            }
+            $stmt->close();
+            return $result;
+        } catch (mysqli_sql_exception $e) {
+            $errorMsg = $e->getMessage();
+            return false;
+        }
     }
 }
 ?>

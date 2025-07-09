@@ -9,7 +9,7 @@ $escuelas = $escuelaModel->getAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Biblioteca - UNTRM</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="/untrm/assets/css/style.css">
 </head>
 <body>
     <header class="header">
@@ -48,6 +48,14 @@ $escuelas = $escuelaModel->getAll();
                             </svg>
                             <span><?php echo htmlspecialchars($_SESSION['user']['nombre_completo']); ?></span>
                         </div>
+                        <?php if (isset($_SESSION['user']['rol_id']) && $_SESSION['user']['rol_id'] == 3): ?>
+                            <a href="/untrm/gestion_usuarios.php" class="admin-link">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                                </svg>
+                                Registrar Usuarios
+                            </a>
+                        <?php endif; ?>
                         <a href="index.php?page=auth&action=logout" class="logout-btn">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -74,4 +82,4 @@ $escuelas = $escuelaModel->getAll();
     </header>
 
     <main class="main-content">
-        <div class="container">
+        <div class="container"></main>

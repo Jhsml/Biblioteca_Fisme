@@ -1061,3 +1061,19 @@ body {
     white-space: nowrap;
     border: 0;
 }
+
+.form-container-centered {
+    max-width: 380px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+}
+
+.registrar-libro-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+}

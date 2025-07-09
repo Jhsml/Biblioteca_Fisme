@@ -43,7 +43,8 @@
         <?php endif; ?>
 
         <!-- Librarian Panel -->
-        <?php if (isset($_SESSION['user']) && $_SESSION['user']['rol_id'] >= 2): ?>
+        <!-- Para Bibliotecario -->
+        <?php if (isset($_SESSION['user']) && $_SESSION['user']['rol_id'] == 2): ?>
         <div class="widget">
             <h3 class="widget-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -68,6 +69,43 @@
                         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                     </svg>
                     Historial de Préstamos
+                </a>
+                <a href="index.php?page=loans&action=reports" class="menu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                    </svg>
+                    Reportes
+                </a>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Admin Panel -->
+        <?php if (isset($_SESSION['user']) && $_SESSION['user']['rol_id'] == 3): ?>
+        <div class="widget">
+            <h3 class="widget-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Panel de Administrador
+            </h3>
+            <div class="librarian-menu">
+                <a href="views/admin/registrar_libro.php" class="menu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    Registrar Libros
+                </a>
+                <a href="/untrm/gestion_usuarios.php" class="menu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="7" r="4"></circle>
+                        <path d="M5.5 21v-2a4.5 4.5 0 0 1 9 0v2"></path>
+                    </svg>
+                    Registrar Usuarios
                 </a>
                 <a href="index.php?page=loans&action=reports" class="menu-item">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -178,5 +216,9 @@
     </aside>
     <?php endif; ?>
 </div>
-
-
+<div class="book-detail-card">
+    <h2><?php echo htmlspecialchars($detalle['titulo']); ?></h2>
+    <p><strong>ISBN:</strong> <?php echo $detalle['isbn']; ?></p>
+    <p><strong>Año:</strong> <?php echo $detalle['publicacion_anio']; ?></p>
+    <p><strong>Descripción:</strong> <?php echo $detalle['descripcion']; ?></p>
+</div>
