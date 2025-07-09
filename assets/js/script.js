@@ -323,34 +323,36 @@ function reserveBook(bookId) {
         openAuthModal();
         return;
     }
-    
+
     const formData = new FormData();
     formData.append('libro_id', bookId);
-    
+
     fetch('index.php?page=books&action=reserve', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showMessage(data.message, 'success');
-            loadUserReservations();
-        } else {
-            showMessage(data.message, 'error');
+    .then(async response => {
+        const text = await response.text();
+
+        try {
+            const data = JSON.parse(text); // Verifica si es JSON válido
+
+            if (data.success) {
+                showMessage(data.message, 'success');
+                loadUserReservations();
+            } else {
+                showMessage(data.message || 'Ocurrió un error', 'error');
+            }
+        } catch (e) {
+            console.error('Respuesta inesperada del servidor:', text);
+            showMessage('Error del servidor. Ver consola.', 'error');
         }
     })
     .catch(error => {
         showMessage('Error al procesar la reserva', 'error');
-        console.error('Error:', error);
+        console.error('Error de red:', error);
     });
 }
-
-function reserveBookFromModal(bookId) {
-    reserveBook(bookId);
-    closeBookModal();
-}
-
 // Loan Management Functions
 function confirmLoan(loanId) {
     const formData = new FormData();

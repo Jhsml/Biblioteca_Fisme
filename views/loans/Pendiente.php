@@ -35,15 +35,15 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <div class="user-name"><?php echo htmlspecialchars($loan['usuario']['nombre_completo']); ?></div>
-                                        <div class="user-email"><?php echo htmlspecialchars($loan['usuario']['correo']); ?></div>
+                                        <div class="user-name"><?php echo htmlspecialchars($loan['usuarios']['nombre_completo']); ?></div>
+                                        <div class="user-email"><?php echo htmlspecialchars($loan['usuarios']['correo']); ?></div>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 <div class="book-info">
-                                    <div class="book-title"><?php echo htmlspecialchars($loan['libro']['titulo']); ?></div>
-                                    <div class="book-isbn">ISBN: <?php echo htmlspecialchars($loan['libro']['isbn']); ?></div>
+                                    <div class="book-title"><?php echo htmlspecialchars($loan['libros']['titulo']); ?></div>
+                                    <div class="book-isbn">ISBN: <?php echo htmlspecialchars($loan['libros']['isbn']); ?></div>
                                 </div>
                             </td>
                             <td>

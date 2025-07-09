@@ -178,9 +178,3 @@
     </aside>
     <?php endif; ?>
 </div>
-<div class="book-detail-card">
-    <h2><?php echo htmlspecialchars($detalle['titulo']); ?></h2>
-    <p><strong>ISBN:</strong> <?php echo $detalle['isbn']; ?></p>
-    <p><strong>Año:</strong> <?php echo $detalle['publicacion_anio']; ?></p>
-    <p><strong>Descripción:</strong> <?php echo $detalle['descripcion']; ?></p>
-</div>

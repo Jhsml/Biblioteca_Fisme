@@ -1,34 +1,53 @@
 <?php
 session_start();
-require_once 'config/Conexion.php';
-require_once 'controllers/Controladorautenticacion.php';
-require_once 'controllers/Controladorinicio.php';
-require_once 'controllers/Controladorprestamos.php';
-require_once 'controllers/Controladorlibro.php';
 
-// Simple routing
+require_once 'config/Conexion.php';
+
+// Mapeo de controladores disponibles
+$controllers = [
+    'auth'   => 'Controladorautenticacion',
+    'books'  => 'Controladorlibro',
+    'loans'  => 'Controladorprestamos',
+    'home'   => 'Controladorinicio',
+    // para casos por defecto
+];
+
+// Parámetros desde la URL
 $page = $_GET['page'] ?? 'home';
 $action = $_GET['action'] ?? 'index';
 
-switch ($page) {
-    case 'auth':
-        $controller = new Controladorautenticacion();
-        break;
-    case 'books':
-        $controller = new Controladorinicio();
-        break;
-    case 'loans':
-        $controller = new Controladorprestamos();
-        break;
-    default:
-        $controller = new Controladorlibro();
-        break;
+// Obtener el nombre de clase del controlador
+$controllerClass = $controllers[$page] ?? 'Controladorlibro';
+
+// Verifica que el archivo del controlador exista
+$controllerFile = "controllers/{$controllerClass}.php";
+if (!file_exists($controllerFile)) {
+    http_response_code(404);
+    echo "Error: Controlador no encontrado.";
+    exit;
 }
 
-// Call the appropriate method
+// Incluir el archivo del controlador
+require_once $controllerFile;
+
+// Verifica que la clase exista y crea la instancia
+if (!class_exists($controllerClass)) {
+    http_response_code(500);
+    echo "Error: Clase del controlador '{$controllerClass}' no definida.";
+    exit;
+}
+
+$controller = new $controllerClass();
+
+// Llama al método si existe
 if (method_exists($controller, $action)) {
     $controller->$action();
 } else {
-    $controller->index();
+    if (method_exists($controller, 'index')) {
+        $controller->index(); // fallback
+    } else {
+        http_response_code(404);
+        echo "Error: Acción '{$action}' no encontrada en {$controllerClass}.";
+    }
 }
 ?>

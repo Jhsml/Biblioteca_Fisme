@@ -36,13 +36,13 @@
                                             <circle cx="12" cy="7" r="4"></circle>
                                         </svg>
                                     </div>
-                                    <div class="user-name"><?php echo htmlspecialchars($loan['usuario']['nombre_completo']); ?></div>
+                                    <div class="user-name"><?php echo htmlspecialchars($loan['usuarios']['nombre_completo']); ?></div>
                                 </div>
                             </td>
                             <td>
                                 <div class="book-info">
-                                    <div class="book-title"><?php echo htmlspecialchars($loan['libro']['titulo']); ?></div>
-                                    <div class="book-isbn">ISBN: <?php echo htmlspecialchars($loan['libro']['isbn']); ?></div>
+                                    <div class="book-title"><?php echo htmlspecialchars($loan['libros']['titulo']); ?></div>
+                                    <div class="book-isbn">ISBN: <?php echo htmlspecialchars($loan['libros']['isbn']); ?></div>
                                 </div>
                             </td>
                             <td>
