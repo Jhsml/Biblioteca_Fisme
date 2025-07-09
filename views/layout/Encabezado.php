@@ -1,3 +1,8 @@
+<?php
+require_once 'models/Escuela.php';
+$escuelaModel = new Escuela();
+$escuelas = $escuelaModel->getAll();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -63,7 +68,9 @@
                     <?php endif; ?>
                 </div>
             </div>
+            
         </div>
+        
     </header>
 
     <main class="main-content">

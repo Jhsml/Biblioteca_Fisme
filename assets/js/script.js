@@ -72,7 +72,7 @@ function showBookDetails(bookId) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-   fetch(`index.php?page=libro&action=details&id=${bookId}`) // ← ¡correcto si usas Controladorinicio!
+  fetch(`index.php?page=books&action=details&id=${bookId}`) // ← ¡correcto si usas Controladorinicio!
         .then(response => response.json())
         .then(book => {
             content.innerHTML = generateBookDetailsHTML(book);  // Asegúrate de que esta función esté definida
@@ -353,24 +353,121 @@ function reserveBook(bookId) {
         console.error('Error de red:', error);
     });
 }
-// Loan Management Functions
-function confirmLoan(loanId) {
+function reserveBookFromModal(libroId) {
+   if (!document.querySelector('.user-info')) {
+        openAuthModal();
+        return;
+    }
+
     const formData = new FormData();
-    formData.append('loan_id', loanId);
-    
-    fetch('index.php?page=loans&action=confirm', {
+    formData.append('libro_id', libroId);
+
+    fetch('index.php?page=books&action=reserve', {
         method: 'POST',
         body: formData
     })
+    .then(async response => {
+        const text = await response.text();
+
+        try {
+            const data = JSON.parse(text); // Verifica si es JSON válido
+
+            if (data.success) {
+                showMessage(data.message, 'success');
+                loadUserReservations();
+            } else {
+                showMessage(data.message || 'Ocurrió un error', 'error');
+            }
+        } catch (e) {
+            console.error('Respuesta inesperada del servidor:', text);
+            showMessage('Error del servidor. Ver consola.', 'error');
+        }
+    })
+    .catch(error => {
+        showMessage('Error al procesar la reserva', 'error');
+        console.error('Error de red:', error);
+    });
+}
+function marcarDevuelto(id) {
+    fetch('index.php?page=loans&action=markReturned', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `loan_id=${encodeURIComponent(id)}`
+    })
     .then(response => response.json())
     .then(data => {
+        showMessage(data.message, data.success ? 'success' : 'error');
         if (data.success) {
-            showMessage(data.message, 'success');
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        } else {
-            showMessage(data.message, 'error');
+            const row = document.querySelector(`button[onclick="marcarDevuelto(${id})"]`).closest('tr');
+            if (row) row.remove();
+        }
+    })
+    .catch(error => {
+        showMessage('Error al marcar como devuelto', 'error');
+        console.error('Error:', error);
+    });
+}
+function markNotReturned(loanId) {
+    const formData = new FormData();
+    formData.append('loan_id', loanId);
+
+    fetch('index.php?page=loans&action=marcarNoDevuelto', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.text())
+    .then(text => {
+        try {
+            const json = JSON.parse(text);
+           showMessage(json.message, 'error');
+
+            if (json.success) {
+                const button = document.querySelector(`button[onclick="markNotReturned(${loanId})"]`);
+                if (button) {
+                    const row = button.closest('tr');
+                    if (row) {
+                        // Buscar el <span> con la clase status-badge dentro del <td>
+                        const estadoSpan = row.querySelector('td span.status-badge');
+                        if (estadoSpan) {
+                            // Actualizar el texto
+                            estadoSpan.textContent = 'Perdido';
+
+                            // Quitar clases previas de estado
+                            estadoSpan.classList.remove('status-activo', 'status-devuelto', 'status-perdido');
+                            // Añadir la clase correspondiente a "perdido"
+                            estadoSpan.classList.add('status-perdido');
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Respuesta no válida:', text);
+            showMessage('Error inesperado. Revisa consola.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error de red:', error);
+        showMessage('Error de red al procesar la solicitud', 'error');
+    });
+}
+
+
+
+// Loan Management Functions
+function confirmLoan(id) {
+    fetch('index.php?page=loans&action=confirm', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `loan_id=${encodeURIComponent(id)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        showMessage(data.message, data.success ? 'success' : 'error');
+        if (data.success) {
+            const row = document.querySelector(`button[onclick="confirmLoan(${id})"]`).closest('tr');
+            if (row) row.remove();
         }
     })
     .catch(error => {
@@ -378,6 +475,38 @@ function confirmLoan(loanId) {
         console.error('Error:', error);
     });
 }
+function rejectLoan(id) {
+    fetch('index.php?page=loans&action=reject', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `loan_id=${encodeURIComponent(id)}`
+    })
+    .then(response => response.text())
+    .then(text => {
+        try {
+            const data = JSON.parse(text);
+
+            // 🔴 SIEMPRE mensaje rojo aunque sea success
+            showMessage(data.message, 'error');
+
+            if (data.success) {
+                const row = document.querySelector(`button[onclick="rejectLoan(${id})"]`).closest('tr');
+                if (row) row.remove();
+            }
+        } catch (e) {
+            console.error('Respuesta no válida:', text);
+            showMessage('Respuesta no válida del servidor', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error de red al rechazar el préstamo', 'error');
+    });
+}
+
+
 
 // User Reservations
 function loadUserReservations() {

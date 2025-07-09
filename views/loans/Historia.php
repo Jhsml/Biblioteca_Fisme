@@ -23,6 +23,7 @@
                         <th>Fecha Vencimiento</th>
                         <th>Estado</th>
                         <th>Observaciones</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,6 +71,26 @@
                                 </span>
                             </td>
                             <td><?php echo htmlspecialchars($loan['observaciones'] ?? '-'); ?></td>
+                           <td>
+    <div style="display: flex; gap: 8px;">
+        <button onclick="marcarDevuelto(<?php echo $loan['id']; ?>)" class="confirm-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"></path>
+                <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+            Devuelto
+        </button>
+        <button onclick="markNotReturned(<?php echo $loan['id']; ?>)" class="reject-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9"></circle>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+            </svg>
+            No devuelto
+        </button>
+    </div>
+</td>
+                                
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -77,3 +98,5 @@
         </div>
     <?php endif; ?>
 </div>
+
+

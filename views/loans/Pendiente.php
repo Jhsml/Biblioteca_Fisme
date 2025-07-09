@@ -58,13 +58,21 @@
                                 </div>
                             </td>
                             <td>
-                                <button onclick="confirmLoan(<?php echo $loan['id']; ?>)" class="confirm-btn">
+                                <button onclick="confirmLoan(<?php echo $loan['id']; ?>)"  class="confirm-btn">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M9 12l2 2 4-4"></path>
                                         <circle cx="12" cy="12" r="9"></circle>
                                     </svg>
                                     Confirmar
                                 </button>
+                               <button onclick="rejectLoan(<?php echo $loan['id']; ?>)" class="reject-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"></circle>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+    </svg>
+    Rechazar
+</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -73,3 +81,5 @@
         </div>
     <?php endif; ?>
 </div>
+
+

@@ -8,19 +8,21 @@ class Controladorlibro {
         $this->bookModel = new Libro();
     }
 
-    public function details() {
-        $id = $_GET['id'] ?? 0;
-        $book = $this->bookModel->getById($id);
+   public function details() {
+    header('Content-Type: application/json');
 
-        if (!$book) {
-            header('HTTP/1.1 404 Not Found');
-            echo json_encode(['error' => 'Libro no encontrado']);
-            exit;
-        }
+    $id = $_GET['id'] ?? 0;
+    $book = $this->bookModel->getById($id);
 
-        header('Content-Type: application/json');
-        echo json_encode($book);
+    if (!$book) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Libro no encontrado']);
+        exit;
     }
+
+    echo json_encode($book);
+    exit;
+}
 
    public function reserve() {
     if (session_status() === PHP_SESSION_NONE) {
@@ -96,3 +98,5 @@ class Controladorlibro {
 }
 }
 ?>
+
+

@@ -24,3 +24,5 @@ class Controladorinicio {
         include 'views/layout/Piedepagina.php';
     }
 }
+
+

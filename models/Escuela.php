@@ -20,3 +20,5 @@ class Escuela {
         return $escuelas;
     }
 }
+
+
